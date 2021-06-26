@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useParams, useHistory } from "react-router";
 import { useQuery } from 'react-query';
 import { getList } from "../api/CatalogAPI";
 import Card from '@material-ui/core/Card';
@@ -15,13 +16,14 @@ import Button from '@material-ui/core/Button';
 
 
 
-export function AlikeProductsPage(classes,category) {
+export function AlikeProductsPage(classes) {
+    const { category } = useParams();
+
     const { data,error,isLoading } = useQuery("products", async () => {
        let { data } = await getList();
        return data;
     });
-
-
+    
   return (
     <div className="page">
         {isLoading ?
@@ -31,7 +33,7 @@ export function AlikeProductsPage(classes,category) {
                  :
             <div>
                 {
-                    data.map((product) => (
+                    data.filter(product => product.categories.includes(category)).map((product) => (
                         <div key={product.id}>{
                             <Card className={classes.card} style={{width:'350px',height:'500px',margin:'10px 10px 10px 0',float:'left'}}>
 
