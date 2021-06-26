@@ -23,7 +23,7 @@ export function AlikeProductsPage(classes) {
        let { data } = await getList();
        return data;
     });
-    
+
   return (
     <div className="page">
         {isLoading ?
