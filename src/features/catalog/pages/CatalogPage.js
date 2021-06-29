@@ -22,12 +22,41 @@ import TextField from '@material-ui/core/TextField';
 export function CatalogPage(classes) {
     const [catalog,setCatalog] = useState([]);
     const [allData,setAllData] = useState([]);
+    const [categories,setCategories] = useState([]);
+    const [mainCheckboxState,setMainCheckboxState] = useState(false);
+    const [categoriesStates,setCategoriesStates] = useState([]);
+    const [chosenCategories,setChosenCategories] = useState([]);
 
     const { data,error,isLoading } = useQuery("products", async () => {
        let { data } = await getList();
        //return data;
         setAllData(data);
         setCatalog(data);
+        let cats = [];
+        data.forEach(function(product,i){
+            product.categories.forEach(function(category,ind){
+               if (!cats.includes(category) && category != null) {
+                   cats.push(category);
+               }
+            });
+        });
+        //console.log(cats.sort());
+        setCategories(cats.sort());
+        setChosenCategories(cats.sort());
+        let catStates = [];
+        //let catStates = categoriesStates;
+        cats.forEach(function(cat){
+
+            let st = {
+                id:cat,
+                state:true
+            };
+            catStates.push(st);
+        });
+        setCategoriesStates(catStates);
+
+        //console.log(categoriesStates);
+
     });
 
     const [isInStore,setIsInStore] = useState(false);
@@ -66,16 +95,97 @@ export function CatalogPage(classes) {
         return `${value}°`;
     }
 
+    const handleCheckboxChange = (event) => {
+        let { target } = event,
+        name = target.name,
+        val = target.checked;
+
+        let chosen = [];
+        if (val === true){
+            chosen = [...chosenCategories,name];
+            setChosenCategories(chosen);
+        } else {
+            chosen = chosenCategories;
+            chosen.splice(chosen.indexOf(name),1);
+            setChosenCategories(chosen);
+        }
+
+        let catStates = categoriesStates;
+        if (catStates.length > 0){
+            catStates[categories.indexOf(name)].state = val;
+            setCategoriesStates(catStates);
+        }
+        console.log(categories);
+        console.log(catStates);
+        console.log(chosen);
+
+        //console.log(chosenCategories);
+    }
+    //console.log(categories);
+    const handleMainCheckboxChange = (event) => {
+        let { target } = event,
+            name = target.name,
+            val = target.checked;
+            console.log(val);
+            let flag = !val;
+        setMainCheckboxState(!val);
+        let catStates = [];
+        let cats = categories;
+        cats.forEach(function(cat){
+            let st = {
+                id:cat,
+                state:flag
+            };
+            catStates.push(st);
+        });
+        //console.log(catStates);
+        setCategoriesStates(catStates);
+
+        if (flag == true){
+            setChosenCategories(categories);
+        } else {
+            setChosenCategories([]);
+        }
+
+    }
 
   return (
     <div className="page">
         {isLoading ?
             <div>Loading...</div>
          : error ?
-                <div>Loading...</div>
+                <div>Something went wrong...</div>
                  :
             <div>
+                <FormControlLabel key="main"
+                                  control={
+                                      <Checkbox
+                                          checked={mainCheckboxState}
+                                          onChange={handleMainCheckboxChange}
+                                          name="main"
+                                          color="primary"
+                                      />
+                                  }
+                                  label="Снять/Выделить все"
+                />
 
+                {
+
+
+                    (categoriesStates.length > 0) &&
+                    categories.map((cat,i) => (
+                        <FormControlLabel key={cat}
+                            control={
+                                <Checkbox
+                                    checked={categoriesStates[i].state}
+                                    onChange={handleCheckboxChange}
+                                    name={cat}
+                                    color="primary"
+                                />
+                            }
+                            label={cat}
+                        />))
+                }
                 <FormGroup>
                     <FormControlLabel
                         control={<Switch size="small" onChange={handleChangeIsInStore} />}
@@ -144,6 +254,14 @@ export function CatalogPage(classes) {
                         if (text != ''){
                             return product.title.indexOf(text) > -1;}
                         else return true;
+                    }).filter(function (product) {
+                        let flag = false;
+                        product.categories.forEach(function(cat){
+                            if (chosenCategories.includes(cat)){
+                                flag = true;
+                            }
+                        });
+                        return flag;
                     }).
 
                     map((product) => (
@@ -205,6 +323,13 @@ export function CatalogPage(classes) {
 
                                         <Rating name="size-medium" defaultValue={product.rating/20} />
 
+                                        <Divider className={classes.divider} light />
+                                        <Typography
+                                            className={"MuiTypography--subheading"}
+                                            variant={"caption"}
+                                        >
+                                            Categories: {product.categories.join()}
+                                        </Typography>
                                         <Divider className={classes.divider} light />
                                         {
                                             product.isInStock ?
