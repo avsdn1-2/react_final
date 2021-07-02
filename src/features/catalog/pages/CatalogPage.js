@@ -73,8 +73,13 @@ export function CatalogPage(classes) {
 
     // получим ссылку на метод dispatch объекта store
     const dispatch = useDispatch();
-    const addProduct = (value) => dispatch(CartDuck.addItem(value)); // сгенерируем функции для действий
+    const addProduct = (product) => dispatch(CartDuck.addItem(product)); // сгенерируем функции для действий
+
+    const saveProducts = (products) => dispatch(CartDuck.saveProducts(products));
     const checkProduct = (value) => dispatch(CartDuck.checkItem(value));
+    //сохраняем все продукты в глобальное состояние
+    saveProducts(catalog);
+
 
 
     const handleChangeIsInStore = () => {
@@ -343,7 +348,7 @@ export function CatalogPage(classes) {
                                             {
                                                 product.isInStock ?
                                                     (
-                                                        <Button onClick={() => addProduct(product.id)} exact component={Link} variant="contained" color="primary">
+                                                        <Button onClick={() => addProduct(product)} exact component={Link} variant="contained" color="primary">
                                                             Добавить в корзину
                                                         </Button>
                                                     ) :

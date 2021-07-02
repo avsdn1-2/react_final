@@ -8,6 +8,7 @@ export function getProduct(id) {
     return axiosInstance.get(`/products/${id}`);
 }
 
+/*
 export function create({ title = 'Test title', body = 'Test body' }) {
     return axiosInstance.post(`/products`, {
         title,
@@ -25,3 +26,4 @@ export function update(id, { title = 'Test title', body = 'Test body' }) {
 export function remove(id) {
     return axiosInstance.delete(`/products/${id}`);
 }
+ */
