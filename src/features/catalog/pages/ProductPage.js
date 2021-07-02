@@ -11,6 +11,8 @@ import Card from "@material-ui/core/Card";
 import StyledBadge from "@material-ui/core/Badge";
 import Rating from "@material-ui/lab/Rating";
 import Button from "@material-ui/core/Button";
+import {useDispatch} from "react-redux";
+import * as CartDuck from "../../cart/ducks/cart.duck";
 
 export function ProductPage(classes) {
     const { id } = useParams();
@@ -21,7 +23,9 @@ export function ProductPage(classes) {
         return data;
     });
 
-
+    // получим ссылку на метод dispatch объекта store
+    const dispatch = useDispatch();
+    const addProduct = (product) => dispatch(CartDuck.addItem(product));
 
   return (
     <div className="page">
@@ -91,7 +95,7 @@ export function ProductPage(classes) {
                                     {
                                         data.isInStock ?
                                             (
-                                                <Button to="/add" exact component={Link} variant="contained" color="primary">
+                                                <Button onClick={() => addProduct(data)} exact component={Link} variant="contained" color="primary">
                                                     Добавить в корзину
                                                 </Button>
                                             ) :

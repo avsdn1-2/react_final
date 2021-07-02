@@ -46,8 +46,7 @@ export function Header() {
   const customClasses = useCustomStyles();
 
   const numProducts = useSelector(CartDuck.selectNumProducts);
- // const numProducts = useSelector(console.log);
- // console.log(numProducts);
+
   const dispatch = useDispatch();
   const clearCart = (value) => dispatch(CartDuck.clearCart()); // сгенерируем функции для действий
 
@@ -68,7 +67,7 @@ export function Header() {
             <Button color="inherit" to="/about" exact component={NavLink}>О нас</Button>
             <Button color="inherit" to="/delivery" exact component={NavLink}>Доставка и оплата</Button>
             <Button color="inherit" to="/catalog" exact component={NavLink}>Каталог</Button>
-            <Button onClick={() => clearCart()} color="inherit" to="" exact component={NavLink}>Очистить корзину</Button>
+            {(numProducts > 0) && <Button onClick={() => clearCart()} color="inherit" to="" exact component={NavLink}>Очистить корзину</Button>}
             <IconButton to="/cart" exact component={NavLink} aria-label="cart">
               <StyledBadge badgeContent={numProducts} color="secondary">
                 <AddShoppingCartIcon />
