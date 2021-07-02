@@ -12,6 +12,9 @@ import { NavLink } from 'react-router-dom';
 import StyledBadge from '@material-ui/core/Badge';
 import  AddShoppingCartIcon  from '@material-ui/icons/AddShoppingCart';
 import Avatar from '@material-ui/core/Avatar';
+import { useSelector } from "react-redux";
+import * as CartDuck from "../../../features/cart/ducks/cart.duck";
+import {useDispatch} from "react-redux";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -42,6 +45,12 @@ export function Header() {
 
   const customClasses = useCustomStyles();
 
+  const numProducts = useSelector(CartDuck.selectNumProducts);
+ // const numProducts = useSelector(console.log);
+ // console.log(numProducts);
+  const dispatch = useDispatch();
+  const clearCart = (value) => dispatch(CartDuck.clearCart()); // сгенерируем функции для действий
+
   return (
     <Fragment>
       <div className={classes.offset} />
@@ -59,8 +68,9 @@ export function Header() {
             <Button color="inherit" to="/about" exact component={NavLink}>О нас</Button>
             <Button color="inherit" to="/delivery" exact component={NavLink}>Доставка и оплата</Button>
             <Button color="inherit" to="/catalog" exact component={NavLink}>Каталог</Button>
+            <Button onClick={() => clearCart()} color="inherit" to="" exact component={NavLink}>Очистить корзину</Button>
             <IconButton to="/cart" exact component={NavLink} aria-label="cart">
-              <StyledBadge badgeContent={0} color="secondary">
+              <StyledBadge badgeContent={numProducts} color="secondary">
                 <AddShoppingCartIcon />
               </StyledBadge>
             </IconButton>

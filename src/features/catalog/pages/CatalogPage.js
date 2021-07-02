@@ -17,6 +17,9 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
+import {useDispatch} from "react-redux";
+import * as CartDuck from "../../cart/ducks/cart.duck";
+
 
 
 export function CatalogPage(classes) {
@@ -28,16 +31,16 @@ export function CatalogPage(classes) {
     const [chosenCategories,setChosenCategories] = useState([]);
 
     const { data,error,isLoading } = useQuery("products", async () => {
-       let { data } = await getList();
-       //return data;
+        let { data } = await getList();
+        //return data;
         setAllData(data);
         setCatalog(data);
         let cats = [];
         data.forEach(function(product,i){
             product.categories.forEach(function(category,ind){
-               if (!cats.includes(category) && category != null) {
-                   cats.push(category);
-               }
+                if (!cats.includes(category) && category != null) {
+                    cats.push(category);
+                }
             });
         });
         //console.log(cats.sort());
@@ -68,6 +71,11 @@ export function CatalogPage(classes) {
     //для слайдера рейтинга
     const [ratingRange, setRatingRange] = useState([0, 100]);
 
+    // получим ссылку на метод dispatch объекта store
+    const dispatch = useDispatch();
+    const addProduct = (value) => dispatch(CartDuck.addItem(value)); // сгенерируем функции для действий
+    const checkProduct = (value) => dispatch(CartDuck.checkItem(value));
+
 
     const handleChangeIsInStore = () => {
         setIsInStore(!isInStore);
@@ -86,7 +94,7 @@ export function CatalogPage(classes) {
     };
     const handleChangeText = (event) => {
         let { target } = event,
-        val = target.value;
+            val = target.value;
         setText(val);
     }
 
@@ -97,8 +105,9 @@ export function CatalogPage(classes) {
 
     const handleCheckboxChange = (event) => {
         let { target } = event,
-        name = target.name,
-        val = target.checked;
+            name = target.name,
+            val = target.checked;
+            alert(val);
 
         let chosen = [];
         if (val === true){
@@ -126,8 +135,8 @@ export function CatalogPage(classes) {
         let { target } = event,
             name = target.name,
             val = target.checked;
-            console.log(val);
-            let flag = !val;
+        console.log(val);
+        let flag = !val;
         setMainCheckboxState(!val);
         let catStates = [];
         let cats = categories;
@@ -149,227 +158,230 @@ export function CatalogPage(classes) {
 
     }
 
-  return (
-    <div className="page">
-        {isLoading ?
-            <div>Loading...</div>
-         : error ?
-                <div>Something went wrong...</div>
-                 :
-            <div>
-                <FormControlLabel key="main"
-                                  control={
-                                      <Checkbox
-                                          checked={mainCheckboxState}
-                                          onChange={handleMainCheckboxChange}
-                                          name="main"
-                                          color="primary"
-                                      />
-                                  }
-                                  label="Снять/Выделить все"
-                />
+    return (
+        <div className="page">
+            {isLoading ?
+                <div>Loading...</div>
+                : error ?
+                    <div>Something went wrong...</div>
+                    :
+                    <div>
+                        <FormControlLabel key="main"
+                                          control={
+                                              <Checkbox
+                                                  checked={mainCheckboxState}
+                                                  onChange={handleMainCheckboxChange}
+                                                  name="main"
+                                                  color="primary"
+                                              />
+                                          }
+                                          label="Снять/Выделить все"
+                        />
 
-                {
-
-
-                    (categoriesStates.length > 0) &&
-                    categories.map((cat,i) => (
-                        <FormControlLabel key={cat}
-                            control={
-                                <Checkbox
-                                    checked={categoriesStates[i].state}
-                                    onChange={handleCheckboxChange}
-                                    name={cat}
-                                    color="primary"
-                                />
-                            }
-                            label={cat}
-                        />))
-                }
-                <FormGroup>
-                    <FormControlLabel
-                        control={<Switch size="small" onChange={handleChangeIsInStore} />}
-                        label="Есть в наличии"
-                    />
-                    <FormControlLabel
-                        control={<Switch size="small" onChange={handleChangeIsSale} />}
-                        label="Распродажа"
-                    />
-                    <FormControlLabel
-                        control={<Switch size="small" onChange={handleChangeIsNew} />}
-                        label="Новинка"
-                    />
-                    <TextField id="outlined-basic" label="Поиск по названию" variant="outlined" onBlur={handleChangeText}/>
-                </FormGroup>
+                        {
 
 
+                            (categoriesStates.length > 0) &&
+                            categories.map((cat,i) => (
+                                <FormControlLabel key={cat}
+                                                  control={
+                                                      <Checkbox
+                                                          checked={categoriesStates[i].state}
+                                                          onChange={handleCheckboxChange}
+                                                          name={cat}
+                                                          color="primary"
+                                                      />
+                                                  }
+                                                  label={cat}
+                                />))
+                        }
+                        <FormGroup>
+                            <FormControlLabel
+                                control={<Switch size="small" onChange={handleChangeIsInStore} />}
+                                label="Есть в наличии"
+                            />
+                            <FormControlLabel
+                                control={<Switch size="small" onChange={handleChangeIsSale} />}
+                                label="Распродажа"
+                            />
+                            <FormControlLabel
+                                control={<Switch size="small" onChange={handleChangeIsNew} />}
+                                label="Новинка"
+                            />
+                            <TextField id="outlined-basic" label="Поиск по названию" variant="outlined" onBlur={handleChangeText}/>
+                        </FormGroup>
 
-                <Typography id="range-slider" gutterBottom>
-                    Ценовой диапазон
-                </Typography>
-                <Slider
-                    value={priceRange}
-                    min={0}
-                    max={1000}
-                    onChange={handlePriceRangeChange}
-                    valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
-                />
-
-                <Typography id="range-slider" gutterBottom>
-                    Рейтинг
-                </Typography>
-                <Slider
-                    value={ratingRange}
-                    min={0}
-                    max={100}
-                    onChange={handleRatingRangeChange}
-                    valueLabelDisplay="auto"
-                    getAriaValueText={valuetext}
-                />
 
 
-                {
+                        <Typography id="range-slider" gutterBottom>
+                            Ценовой диапазон
+                        </Typography>
+                        <Slider
+                            value={priceRange}
+                            min={0}
+                            max={1000}
+                            onChange={handlePriceRangeChange}
+                            valueLabelDisplay="auto"
+                            getAriaValueText={valuetext}
+                        />
 
-                    catalog.filter(function (product) {
-                        if (isInStore === true){
-                        return product.isInStock === true;}
-                        else return true;
-                    }).filter(function (product) {
-                        if (isSale === true){
-                            return product.isSale === true;}
-                        else return true;
-                    }).filter(function (product) {
-                        if (isNew === true){
-                            return product.isNew === true;}
-                        else return true;
-                    }).filter(function (product) {
-                        if (product.price >= priceRange[0] && product.price <= priceRange[1]) return true;
-                        else return false;
-                    }).
-                    filter(function (product) {
-                        if (product.rating >= ratingRange[0] && product.rating <= ratingRange[1]) return true;
-                        else return false;
-                    }).filter(function (product) {
-                        if (text != ''){
-                            return product.title.indexOf(text) > -1;}
-                        else return true;
-                    }).filter(function (product) {
-                        let flag = false;
-                        product.categories.forEach(function(cat){
-                            if (chosenCategories.includes(cat)){
-                                flag = true;
-                            }
-                        });
-                        return flag;
-                    }).
+                        <Typography id="range-slider" gutterBottom>
+                            Рейтинг
+                        </Typography>
+                        <Slider
+                            value={ratingRange}
+                            min={0}
+                            max={100}
+                            onChange={handleRatingRangeChange}
+                            valueLabelDisplay="auto"
+                            getAriaValueText={valuetext}
+                        />
 
-                    map((product) => (
 
-                            <div key={product.id}>{
-                                <Card className={classes.card} style={{width:'350px',height:'500px',margin:'10px 10px 10px 0',float:'left'}}>
+                        {
 
-                                    <img width="350px" height="200px" src={product.photo}/>
-                                    <CardContent className={classes.content}>
-                                        {
-                                            product.isNew ?
-                                                (<StyledBadge badgeContent={"New"} color="secondary">
-                                                    <Typography
-                                                        className={"MuiTypography--heading"}
-                                                        variant={"h6"}
-                                                        gutterBottom
-                                                    >
-                                                        {product.title}
-                                                    </Typography>
-                                                </StyledBadge>) :
-                                                (
-                                                    <Typography
-                                                        className={"MuiTypography--heading"}
-                                                        variant={"h6"}
-                                                        gutterBottom
-                                                    >
-                                                        {product.title}
-                                                    </Typography>
-                                                )
-                                        }
-                                        <Divider className={classes.divider} light />
+                            catalog.filter(function (product) {
+                                if (isInStore === true){
+                                    return product.isInStock === true;}
+                                else return true;
+                            }).filter(function (product) {
+                                if (isSale === true){
+                                    return product.isSale === true;}
+                                else return true;
+                            }).filter(function (product) {
+                                if (isNew === true){
+                                    return product.isNew === true;}
+                                else return true;
+                            }).filter(function (product) {
+                                if (product.price >= priceRange[0] && product.price <= priceRange[1]) return true;
+                                else return false;
+                            }).
+                            filter(function (product) {
+                                if (product.rating >= ratingRange[0] && product.rating <= ratingRange[1]) return true;
+                                else return false;
+                            }).filter(function (product) {
+                                if (text != ''){
+                                    return product.title.indexOf(text) > -1;}
+                                else return true;
+                            }).filter(function (product) {
+                                let flag = false;
+                                product.categories.forEach(function(cat){
+                                    if (chosenCategories.includes(cat)){
+                                        flag = true;
+                                    }
+                                });
+                                return flag;
+                            }).
 
-                                        <Typography
-                                            className={"MuiTypography--subheading"}
-                                            variant={"caption"}
-                                        >
-                                            {product.description}
-                                        </Typography>
-                                        <Divider className={classes.divider} light />
-                                        {
-                                            product.isSale ?
-                                                (<StyledBadge badgeContent={"Sale"} color="secondary">
-                                                    <Typography
+                            map((product) => (
+
+                                <div key={product.id}>{
+                                    <Card className={classes.card} style={{width:'350px',height:'500px',margin:'10px 10px 10px 0',float:'left'}}>
+
+                                        <img width="350px" height="200px" src={product.photo}/>
+                                        <CardContent className={classes.content}>
+                                            {
+                                                product.isNew ?
+                                                    (<StyledBadge badgeContent={"New"} color="secondary">
+                                                        <Typography
+                                                            className={"MuiTypography--heading"}
+                                                            variant={"h6"}
+                                                            gutterBottom
+                                                        >
+                                                            {product.title}
+                                                        </Typography>
+                                                    </StyledBadge>) :
+                                                    (
+                                                        <Typography
+                                                            className={"MuiTypography--heading"}
+                                                            variant={"h6"}
+                                                            gutterBottom
+                                                        >
+                                                            {product.title}
+                                                        </Typography>
+                                                    )
+                                            }
+                                            <Divider className={classes.divider} light />
+
+                                            <Typography
+                                                className={"MuiTypography--subheading"}
+                                                variant={"caption"}
+                                            >
+                                                {product.description}
+                                            </Typography>
+                                            <Divider className={classes.divider} light />
+                                            {
+                                                product.isSale ?
+                                                    (<StyledBadge badgeContent={"Sale"} color="secondary">
+                                                        <Typography
+                                                            className={"MuiTypography--subheading"}
+                                                            variant={"caption"}
+                                                        >
+                                                            Price: {product.price} USD <span style={{width:'50px',color:'white'}}>__</span>
+                                                        </Typography>
+                                                    </StyledBadge>) :
+
+                                                    (<Typography
                                                         className={"MuiTypography--subheading"}
                                                         variant={"caption"}
                                                     >
-                                                        Price: {product.price} USD <span style={{width:'50px',color:'white'}}>__</span>
-                                                    </Typography>
-                                                </StyledBadge>) :
+                                                        Price: {product.price} USD
+                                                    </Typography>)
+                                            }
+                                            <Divider className={classes.divider} light />
 
-                                                (<Typography
-                                                    className={"MuiTypography--subheading"}
-                                                    variant={"caption"}
-                                                >
-                                                    Price: {product.price} USD
-                                                </Typography>)
-                                        }
-                                        <Divider className={classes.divider} light />
+                                            <Rating name="size-medium" defaultValue={product.rating/20} />
 
-                                        <Rating name="size-medium" defaultValue={product.rating/20} />
+                                            <Divider className={classes.divider} light />
+                                            <Typography
+                                                className={"MuiTypography--subheading"}
+                                                variant={"caption"}
+                                            >
+                                                Categories: {product.categories.join()}
+                                            </Typography>
+                                            <Divider className={classes.divider} light />
+                                            {
+                                                product.isInStock ?
+                                                    (
+                                                        <Button onClick={() => addProduct(product.id)} exact component={Link} variant="contained" color="primary">
+                                                            Добавить в корзину
+                                                        </Button>
+                                                    ) :
+                                                    (
+                                                        <Button variant="contained" disabled>
+                                                            Нет в наличии
+                                                        </Button>
+                                                    )
 
-                                        <Divider className={classes.divider} light />
-                                        <Typography
-                                            className={"MuiTypography--subheading"}
-                                            variant={"caption"}
-                                        >
-                                            Categories: {product.categories.join()}
-                                        </Typography>
-                                        <Divider className={classes.divider} light />
-                                        {
-                                            product.isInStock ?
-                                            (
-                                                <Button to="/add" exact component={Link} variant="contained" color="primary">
-                                                    Добавить в корзину
+                                            }
+
+                                            <Divider className={classes.divider} light />
+                                                <Button onClick={() => checkProduct(product.id)} exact component={Link} variant="contained" color="primary">
+                                                    Проверить наличие
                                                 </Button>
-                                            ) :
-                                                (
-                                                    <Button variant="contained" disabled>
-                                                        Нет в наличии
-                                                    </Button>
-                                                )
+                                            <Divider className={classes.divider} light />
+                                        </CardContent>
+                                        <div>
+                                            <Link to={`/products/${product.id}`}><button>Узнать больше...</button></Link>
+                                        </div>
 
-                                        }
-
-                                        <Divider className={classes.divider} light />
-
-                                    </CardContent>
-                                    <div>
-                                        <Link to={`/products/${product.id}`}><button>Узнать больше...</button></Link>
-                                    </div>
-
-                                </Card>
+                                    </Card>
 
 
 
 
-                            }   </div>
-                        ))
+                                }   </div>
+                            ))
 
-                }
-            </div>
-
-
-        }
+                        }
+                    </div>
 
 
-    </div>
-  );
+            }
+
+
+        </div>
+    );
 }
 
 CatalogPage.propTypes = {};
