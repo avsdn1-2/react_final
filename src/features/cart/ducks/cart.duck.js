@@ -16,6 +16,7 @@ export const CLEAR_CART = 'CLEAR_CART';
 export const SET_FIELD = 'SET_FIELD';
 export const CHECK_ITEM = 'CHECK_ITEM';
 export const SAVE_PRODUCTS = 'SAVE_PRODUCTS';
+export const SAVE_CATEGORIES = 'SAVE_CATEGORIES';
 
 // action creators
 export function addItem(product) {
@@ -54,10 +55,16 @@ export function checkItem() {
 }
 
 export function saveProducts(products) {
-
   return {
     type: SAVE_PRODUCTS,
     products,
+  }
+}
+
+export function saveCategories(categories) {
+  return {
+    type: SAVE_CATEGORIES,
+    categories,
   }
 }
 
@@ -72,6 +79,7 @@ export function setField(key, value) {
 // initial state
 const initialState = {
   products: [],
+  categories: [],
   items: [],
   numProducts: 0,
   total: 0
@@ -83,14 +91,14 @@ const reducerReactionsMap = {
 
 // reducer
 export function reducer(state = initialState, action) {
-  let { type, id, qty, product, key, value, products } = action;
+  let { type, id, qty, product, key, value, products, categories } = action;
   console.log('type');
   console.log(type);
   switch (type) {
     case ADD_ITEM:
 
       return produce(state, (s) => {
-        //s.items.push(item);
+
         let index = s.items.findIndex((el) => el.id == product.id);
         if (index > -1) {
           s.items[index].qty = s.items[index].qty + 1;
@@ -112,33 +120,16 @@ export function reducer(state = initialState, action) {
         console.log(s.items);
 
       });
-      /*
-        let numProducts = state.numProducts;
 
-        return produce(state, (s) => {
-          let prod = {
-            id:item,
-            qty:1
-          }
-          s.items.push(prod);
-          console.log('-------------',s.numProducts);
-          s.numProducts = s.numProducts + 1;
-     */
 
     case UPDATE_ITEM:
-      console.log('id');
-      console.log(id);
-      console.log('qty');
-      console.log(qty);
+
       return produce(state, (s) => {
         let index = s.items.findIndex(el => el.id === id);
         if (index > -1) {
           let old_qty = s.items[index].qty;
           let old_amount = s.items[index].amount;
-          console.log('old_qty');
-          console.log(old_qty);
-          console.log('old_amount');
-          console.log(old_amount);
+
           s.items[index].qty = qty;
           s.items[index].amount = s.items[index].price * qty;
           s.numProducts = parseFloat(s.numProducts) - parseFloat(old_qty) + parseFloat(qty);
@@ -160,8 +151,6 @@ export function reducer(state = initialState, action) {
 
     case CLEAR_CART:
       return produce(state, (s) => {
-
-       //   s.items.splice(0,  s.items.length - 1);
         s.products = [];
         s.items = [];
         s.amounts = [];
@@ -169,22 +158,15 @@ export function reducer(state = initialState, action) {
         s.total = 0;
 
       });
-/*
-    case CHECK_ITEM:
-      return produce(state, (s) => {
-        let result = false;
-        let index = s.items.findIndex((el)=>el.id == item);
-        if (index > -1) result = true;
-        console.log(result);
-
-      });
- */
 
     case SAVE_PRODUCTS:
       return produce(state, (s) => {
         s.products = products;
+      });
 
-
+    case SAVE_CATEGORIES:
+      return produce(state, (s) => {
+        s.categories = categories;
       });
 
 
@@ -195,7 +177,6 @@ export function reducer(state = initialState, action) {
       });
 
     default:
-      //alert('default');
       return state;
   }
 }
@@ -205,10 +186,9 @@ export const selectField = (s,key) => s[namespace][key];
 export const selectNumProducts = (s) => selectField(s,'numProducts');
 export const selectItems = state => state[namespace].items;
 export const selectProducts = state => state[namespace].products;
+export const selectCategories = state => state[namespace].categories;
 export const selectTotal = state => state[namespace].total;
-export const selectIsInCart = (s,item) => {let index = s.items.findIndex((el)=>el.id == item);
-                                            if (index > -1) return true
-                                            else return false};
+
 
 
 

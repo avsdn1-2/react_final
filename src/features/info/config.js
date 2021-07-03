@@ -1,3 +1,3 @@
 export const featureConf = {
-  name: 'feature',
+  name: 'info',
 };

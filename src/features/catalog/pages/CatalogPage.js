@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect,useLayoutEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 import { getList } from "../api/CatalogAPI";
@@ -17,7 +17,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import * as CartDuck from "../../cart/ducks/cart.duck";
 
 
@@ -29,6 +29,7 @@ export function CatalogPage(classes) {
     const [mainCheckboxState,setMainCheckboxState] = useState(false);
     const [categoriesStates,setCategoriesStates] = useState([]);
     const [chosenCategories,setChosenCategories] = useState([]);
+
 
     const { data,error,isLoading } = useQuery("products", async () => {
         let { data } = await getList();
@@ -43,21 +44,31 @@ export function CatalogPage(classes) {
                 }
             });
         });
-        //console.log(cats.sort());
-        setCategories(cats.sort());
-        setChosenCategories(cats.sort());
+
+        cats.sort();
+        setCategories(cats);
+        setChosenCategories(cats);
+
+
         let catStates = [];
 
         cats.forEach(function(cat,i){
             let st = {
                 id:cat,
-                state:categoriesStates.length == 0? true: categoriesStates[i].state
+                state:categoriesStates.length == 0? false: categoriesStates[i].state
             };
             catStates.push(st);
         });
         setCategoriesStates(catStates);
 
     });
+
+    // получим ссылку на метод dispatch объекта store
+    const dispatch = useDispatch();
+    const saveCategories = (categories) => dispatch(CartDuck.saveCategories(categories));
+
+    saveCategories(categories);
+
 
     const [isInStore,setIsInStore] = useState(false);
     const [isSale,setIsSale] = useState(false);
@@ -68,14 +79,16 @@ export function CatalogPage(classes) {
     //для слайдера рейтинга
     const [ratingRange, setRatingRange] = useState([0, 100]);
 
-    // получим ссылку на метод dispatch объекта store
-    const dispatch = useDispatch();
+
     const addProduct = (product) => dispatch(CartDuck.addItem(product)); // сгенерируем функции для действий
 
     const saveProducts = (products) => dispatch(CartDuck.saveProducts(products));
     const checkProduct = (value) => dispatch(CartDuck.checkItem(value));
     //сохраняем все продукты в глобальное состояние
     saveProducts(catalog);
+
+
+
 
 
 
@@ -108,55 +121,36 @@ export function CatalogPage(classes) {
     const handleCheckboxChange = (event) => {
         let { target } = event,
             name = target.name;
-            alert(target.checked);
+            //alert(target.checked);
             let val = target.checked;
-            alert(val);
-
-        /*
-        let chosen = [];
-        if (val === true){
-            chosen = [...chosenCategories,name];
-            setChosenCategories(chosen);
-        } else {
-            chosen = chosenCategories;
-            console.log('chosenCategories old');
-            console.log(chosenCategories);
-            chosen.splice(chosen.indexOf(name),1);
-            setChosenCategories(chosen);
-        }
-        */
+            //alert(val);
 
         let catStates = categoriesStates;
-        //if (catStates.length > 0){
-            let index = catStates.findIndex((catState) => catState.id == name);
-            //catStates[categories.indexOf(name)].state = val;
-            catStates[index].state = val;
-            setCategoriesStates(catStates);
 
-            let chosen = [];
-            catStates.forEach(function(catState){
-               if (catState.state === true){
-                   chosen.push(catState.id);
-               }
-            });
+        let index = catStates.findIndex((catState) => catState.id == name);
+        catStates[index].state = val;
+        setCategoriesStates(catStates);
+
+        let chosen = [];
+        catStates.forEach(function(catState){
+           if (catState.state === true){
+               chosen.push(catState.id);
+           }
+        });
         setChosenCategories(chosen);
+        saveCategories(chosen);
 
-        //}
         console.log(categories);
         console.log(catStates);
         console.log(chosen);
-
-        //console.log(chosenCategories);
     }
-    //console.log(categories);
+
     const handleMainCheckboxChange = (event) => {
         let { target } = event;
         let name = target.name;
         let val = target.checked;
-        alert(val);
-        let flag = val;
-        alert(flag);
-        setMainCheckboxState(flag);
+        let flag = !val;
+        setMainCheckboxState(val);
         let catStates = [];
         let cats = categories;
         cats.forEach(function(cat){
@@ -166,7 +160,6 @@ export function CatalogPage(classes) {
             };
             catStates.push(st);
         });
-        //console.log(catStates);
         setCategoriesStates(catStates);
 
         if (flag == true){
@@ -176,6 +169,8 @@ export function CatalogPage(classes) {
         }
 
     }
+
+    //let chosenCat = useSelector(CartDuck.selectCategories);
 
     return (
         <div className="page">
@@ -256,7 +251,7 @@ export function CatalogPage(classes) {
                             {
                                 (categoriesStates.length > 0) &&
                                 categories.map((cat,i) => (
-                                    <label>
+                                    <label key={i}>
                                         {cat}
                                         <input key={cat}
                                                style={{margin:'0 20px 0 0'}}
