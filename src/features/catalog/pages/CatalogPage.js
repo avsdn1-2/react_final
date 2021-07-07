@@ -27,19 +27,41 @@ export function CatalogPage(classes) {
     const [catalog,setCatalog] = useState([]);
     const [allData,setAllData] = useState([]);
     const [categories,setCategories] = useState([]);
+    const [categoriesNames,setCategoriesNames] = useState([]);
     const [categoriesNew,setCategoriesNew] = useState([]);
     const [mainCheckboxState,setMainCheckboxState] = useState(false);
     const [categoriesStates,setCategoriesStates] = useState([]);
     const [chosenCategories,setChosenCategories] = useState([]);
 
-    /*
-    const { dataC,errorC,isLoadingC } = useQuery("category", async () => {
-        let { dataC } = await getCategories();
+
+    const { data: dataC, error: errorC, isLoading: isLoadingC } = useQuery("category", async () => {
+        let { data: dataC } = await getCategories();
         //return dataC;
-        setCategoriesNew(dataC);
+        let cats = []; //id всех категорий
+        let catsNames = []; //названия всех категорий
+        dataC.forEach(function(category){
+            cats.push(category.id);
+            catsNames.push(category.name);
+        });
+        setCategories(cats);
+        setCategoriesNames(catsNames);
+        setChosenCategories(cats);
+
+        let catStates = [];
+
+        cats.forEach(function(cat,i){
+            let st = {
+                id:cat,
+                state:categoriesStates.length == 0? false: categoriesStates[i].state
+            };
+            catStates.push(st);
+        });
+        setCategoriesStates(catStates);
+
+
 
     });
-    */
+
     //console.log(dataC);
 
     const { data,error,isLoading } = useQuery("products", async () => {
@@ -47,6 +69,7 @@ export function CatalogPage(classes) {
         //return data;
         setAllData(data);
         setCatalog(data);
+        /*
         let cats = [];
         data.forEach(function(product,i){
             product.categories.forEach(function(category,ind){
@@ -71,6 +94,7 @@ export function CatalogPage(classes) {
             catStates.push(st);
         });
         setCategoriesStates(catStates);
+        */
 
     });
 
@@ -133,14 +157,16 @@ export function CatalogPage(classes) {
 
     const handleCheckboxChange = (event) => {
         let { target } = event,
-            name = target.name;
+            name = target.name; //название категории
+            let ind = categoriesNames.indexOf(name);
+            let category_id = categories[ind];
             //alert(target.checked);
             let val = target.checked;
             //alert(val);
 
         let catStates = categoriesStates;
 
-        let index = catStates.findIndex((catState) => catState.id == name);
+        let index = catStates.findIndex((catState) => catState.id == category_id);
         catStates[index].state = val;
         setCategoriesStates(catStates);
 
@@ -188,7 +214,7 @@ export function CatalogPage(classes) {
 
     return (
         <div className="page">
-            {isLoading ?
+            {isLoading || isLoadingC?
                 <div>Loading...</div>
                 : error ?
                     <div>Something went wrong...</div>
@@ -266,7 +292,7 @@ export function CatalogPage(classes) {
 
 
                                 (categoriesStates.length > 0) &&
-                                categories.map((cat,i) => (
+                                categoriesNames.map((cat,i) => (
                                     <label key={i}>
                                         {cat}
                                         <input key={cat}
