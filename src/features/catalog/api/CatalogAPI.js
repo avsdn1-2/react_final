@@ -8,6 +8,10 @@ export function getProduct(id) {
     return axiosInstance.get(`/products/${id}`);
 }
 
+export function getCategories() {
+    return axiosInstance.get('/category');
+}
+
 /*
 export function create({ title = 'Test title', body = 'Test body' }) {
     return axiosInstance.post(`/products`, {

@@ -2,6 +2,7 @@ import React, {useEffect,useLayoutEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 import { getList } from "../api/CatalogAPI";
+import { getCategories } from "../api/CatalogAPI";
 import Card from '@material-ui/core/Card';
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
@@ -26,10 +27,20 @@ export function CatalogPage(classes) {
     const [catalog,setCatalog] = useState([]);
     const [allData,setAllData] = useState([]);
     const [categories,setCategories] = useState([]);
+    const [categoriesNew,setCategoriesNew] = useState([]);
     const [mainCheckboxState,setMainCheckboxState] = useState(false);
     const [categoriesStates,setCategoriesStates] = useState([]);
     const [chosenCategories,setChosenCategories] = useState([]);
 
+    /*
+    const { dataC,errorC,isLoadingC } = useQuery("category", async () => {
+        let { dataC } = await getCategories();
+        //return dataC;
+        setCategoriesNew(dataC);
+
+    });
+    */
+    //console.log(dataC);
 
     const { data,error,isLoading } = useQuery("products", async () => {
         let { data } = await getList();
@@ -62,6 +73,8 @@ export function CatalogPage(classes) {
         setCategoriesStates(catStates);
 
     });
+
+
 
     // получим ссылку на метод dispatch объекта store
     const dispatch = useDispatch();
@@ -172,6 +185,7 @@ export function CatalogPage(classes) {
 
     //let chosenCat = useSelector(CartDuck.selectCategories);
 
+
     return (
         <div className="page">
             {isLoading ?
@@ -249,6 +263,8 @@ export function CatalogPage(classes) {
                             </label>
                             <div style={{width:'500px'}}></div>
                             {
+
+
                                 (categoriesStates.length > 0) &&
                                 categories.map((cat,i) => (
                                     <label key={i}>
