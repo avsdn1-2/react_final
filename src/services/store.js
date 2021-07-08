@@ -20,6 +20,7 @@ ducks.forEach(duck => {
  * Grab all sagas together
  */
 const sagas = ducks.map(d => d.sagas);
+//const sagas = ducks.filter(d => !!d.sagas).map(d => d.sagas);
 
 /**
  * Creates the store

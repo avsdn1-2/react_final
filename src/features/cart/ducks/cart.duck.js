@@ -17,6 +17,7 @@ export const SET_FIELD = 'SET_FIELD';
 export const CHECK_ITEM = 'CHECK_ITEM';
 export const SAVE_PRODUCTS = 'SAVE_PRODUCTS';
 export const SAVE_CATEGORIES = 'SAVE_CATEGORIES';
+export const SAVE_ORDER = 'SAVE_ORDER';
 
 // action creators
 export function addItem(product) {
@@ -68,6 +69,13 @@ export function saveCategories(categories) {
   }
 }
 
+export function saveOrder(order) {
+  return {
+    type: SAVE_ORDER,
+    order,
+  }
+}
+
 export function setField(key, value) {
   return {
     type: SET_FIELD,
@@ -82,7 +90,8 @@ const initialState = {
   categories: [],
   items: [],
   numProducts: 0,
-  total: 0
+  total: 0,
+  order:{},
 };
 
 const reducerReactionsMap = {
@@ -91,9 +100,9 @@ const reducerReactionsMap = {
 
 // reducer
 export function reducer(state = initialState, action) {
-  let { type, id, qty, product, key, value, products, categories } = action;
-  console.log('type');
-  console.log(type);
+  let { type, id, qty, product, key, value, products, categories, order } = action;
+  //console.log('type');
+  //console.log(type);
   switch (type) {
     case ADD_ITEM:
 
@@ -167,6 +176,11 @@ export function reducer(state = initialState, action) {
     case SAVE_CATEGORIES:
       return produce(state, (s) => {
         s.categories = categories;
+      });
+
+    case SAVE_ORDER:
+      return produce(state, (s) => {
+        s.order = order;
       });
 
 

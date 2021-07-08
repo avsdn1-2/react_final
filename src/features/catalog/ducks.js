@@ -1,5 +1,5 @@
-import * as exampleDuck from "./ducks/example.duck";
+import * as CatalogDuck from "./ducks/catalog.duck";
 
 export const ducks = [
-  exampleDuck,
+  CatalogDuck,
 ];
