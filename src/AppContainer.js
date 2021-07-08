@@ -21,7 +21,7 @@ export function AppContainer(props) {
   const dispatch = useDispatch();
 
     useEffect(() => {
-     //  dispatch(CatalogDuck.load()); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       dispatch(CatalogDuck.load()); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     }, [])
 
@@ -40,6 +40,7 @@ export function AppContainer(props) {
               {routes.map(route => (
                   <Route key={route.key} path={route.path} exact={route.exact} component={route.component} />
               ))}
+              <Route path="/test" exact component={Page404} />
               <Route path="*" exact component={Page404} />
           </Switch>
 

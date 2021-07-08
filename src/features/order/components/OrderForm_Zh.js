@@ -31,42 +31,47 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export function OrderForm({onSubmit = console.log, isSubmitting = false }) {
-    const { formState: { errors }, handleSubmit, control, register } = useForm({
-        defaultValues: {},
-    });
+    // const lol  = useForm({
+    //     defaultValues: {firstName:"bar",lastName:'asd'},
+    // });
+    // const { formState: { errors,values }, handleSubmit, control, register } = lol;
+    // // console.log('lol',lol)
 
     //console.log(register("test"));
 
     const classes = useStyles();
-
-    const submit = (values) => {
-        // e.preventDefault();
-        onSubmit(values);
-        // console.log(values);
-    };
+    //
+    // const submit = (values) => {
+    //    // e.preventDefault();
+    //     onSubmit(values);
+    //    // console.log(values);
+    // };
+    const { register, handleSubmit, formState: { errors },control } = useForm();
+    const handleRegistration = (data) => console.log(data);
 
     return (
         <Box className={classes.root} mx="auto">
             <Paper>
                 <Box p={3}>
-                    <form onSubmit={handleSubmit(submit)}>
+                    <form onSubmit={handleSubmit(handleRegistration)}>
                         <Typography variant="h6">{'Оформление заказа'}</Typography>
                         <Box mt={3}>
-                            <Controller
-                                name="firstName"
-                                control={control}
-                                rules={{ required: "This field is required." }}
-                                render={({ field }) => (
-                                    <TextField
-                                        inputProps={field}
-                                        className={classes.field}
-                                        error={!!errors.firstName}
-                                        label="FirstName"
-                                        helperText={errors.firstName?.message}
-                                        disabled={isSubmitting}
-                                    />
-                                )}
-                            />
+                            <input name={"firstName"} {...register('firstName')} />
+                            {/*<Controller*/}
+                            {/*    name="firstName"*/}
+                            {/*    control={control}*/}
+                            {/*    rules={{ required: "This field is required." }}*/}
+                            {/*    render={({ field }) => (*/}
+                            {/*        <TextField*/}
+                            {/*            inputProps={field}*/}
+                            {/*            className={classes.field}*/}
+                            {/*            error={!!errors.firstName}*/}
+                            {/*            label="FirstName"*/}
+                            {/*            helperText={errors.firstName?.message}*/}
+                            {/*            disabled={isSubmitting}*/}
+                            {/*        />*/}
+                            {/*    )}*/}
+                            {/*/>*/}
                         </Box>
                         <Box mt={1}>
                             <Controller
@@ -94,12 +99,12 @@ export function OrderForm({onSubmit = console.log, isSubmitting = false }) {
                                 rules={{ required: "This field is required." }}
 
                                 render={({ field }) => (
-                                    <NativeSelect id="select" inputProps={field}>
+                                    <NativeSelect id="select">
                                         <option value="Ukraine">Ukraine</option>
                                         <option value="Poland">Poland</option>
                                         <option value="Italy">Italy</option>
                                     </NativeSelect>
-                                )}
+                                    )}
                             />
                         </Box>
                         <Box mt={1}>
@@ -112,7 +117,7 @@ export function OrderForm({onSubmit = console.log, isSubmitting = false }) {
                                             return "Please provide correct phone number";
                                         }
                                     }
-                                }}
+                                       }}
                                 render={({ field }) => (
                                     <TextField
                                         inputProps={field}
@@ -189,11 +194,11 @@ export function OrderForm({onSubmit = console.log, isSubmitting = false }) {
                                 name="email"
                                 control={control}
                                 rules={{ required: "This field is required.",
-                                    validate: (value) => {
-                                        if (!/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(value)) {
-                                            return "Please provide correct email";
+                                         validate: (value) => {
+                                            if (!/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(value)) {
+                                                return "Please provide correct email";
+                                            }
                                         }
-                                    }
                                 }}
                                 render={({ field }) => (
                                     <TextField
@@ -210,72 +215,27 @@ export function OrderForm({onSubmit = console.log, isSubmitting = false }) {
                         </Box>
 
                         <Box mt={1}>
-                            <label htmlFor="delivery">Delivery</label>
-                              <Controller
-                                      rules={{ required: true }}
-                                      control={control}
-                                      defaultValue="post"
-                                      name="delivery"
-                                      render={({ name, value }) => (
-                                        <RadioGroup
-                                          value={value}
-
-                                        >
-                                          <FormControlLabel
-                                            value="post"
-                                            control={<Radio />}
-                                            label="Почтовая служба"
-                                          />
-
-                                            <FormControlLabel
-                                                value="own"
-                                                control={<Radio />}
-                                                label="Самовывоз"
-                                            />
-
-                                        </RadioGroup>
-                                      )}
-                                    />
-
-
-
+                            <FormControl component="fieldset">
+                                <FormLabel component="legend">Delivery type</FormLabel>
+                                <RadioGroup aria-label="Delivery type" name="deliveryType" >
+                                    <FormControlLabel value="female" control={<Radio />} label="Почтовая служба" />
+                                    <FormControlLabel value="male" control={<Radio />} label="Самовывоз" />
+                                </RadioGroup>
+                            </FormControl>
                         </Box>
 
                         <Box mt={1}>
+                            <FormControlLabel control={<Checkbox name="dontCallMe" />} label="Do not call me" />
+                        </Box>
 
-                            <Controller
-                                control={control}
-                                name="dontCallMe"
-                                render={({
-                                             field: { onChange, onBlur, value, name, ref },
-                                             fieldState: { invalid, isTouched, isDirty, error },
-                                             formState,
-                                         }) => (
-                                    <Checkbox
-                                        onBlur={onBlur}
-                                        onChange={onChange}
-                                        checked={value}
-                                        inputRef={ref}
-                                    />
-                                )}
+                        <Box mt={1}>
+                            <TextareaAutosize
+                                maxRows={4}
+                                name="comments"
+                                aria-label="maximum height"
+                                placeholder="Maximum 4 rows"
+                                defaultValue=""
                             />
-                            <label htmlFor="dontCallMe">Do not call me</label>
-                        </Box>
-
-                        <Box mt={1}>
-
-
-                                    <TextareaAutosize
-                                        maxRows={4}
-                                        name="comments"
-                                        aria-label="maximum height"
-                                        placeholder="Maximum 4 rows"
-                                        defaultValue=""
-                                    />
-                                
-
-
-
                         </Box>
 
 

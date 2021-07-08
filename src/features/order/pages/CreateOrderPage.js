@@ -18,23 +18,14 @@ export function CreateOrderPage() {
      */
 
     const onSubmit = (values) => {
-        console.log(values);
+        console.log('values',values);
         //dispatch(CartDuck.saveOrder({firstName:values.firstName,lastName:values.lastName}));
     }
     const createOrder = useSaveOrder((e) => {
         e.preventDefault();
        // history.push("/posts");
     });
-    /*
-    const processForm = (values) => {
-        console.log(values);
-    }
-    const handleS = (event) => {
-        event.preventDefault();
-        console.log(event.target.elements.firstName.value) // from elements property
-        console.log(event.target.firstName.value)          // or directly
-    }
-     */
+
   return (
     <div className="page">
       Create Order page

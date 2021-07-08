@@ -13,11 +13,13 @@ const slice = createSlice({
     data: null,
     error: null,
   },
-  reducer: {
+  reducers: {
     loadStart: (state, action) => {
       state.isLoading = true;
     },
     loadEnd: (state, action) => {
+      console.log('loadEnd_action');
+      console.log(action);
       let { payload: { data = [], error = null } } = action;
       state.isLoading = false;
       state.data = data;
@@ -31,8 +33,8 @@ const slice = createSlice({
   },
 });
 
-console.log('slice.actions.load');
-console.log(slice.actions.load);
+console.log('slice.actions');
+console.log(slice.actions);
 export const { loadStart, loadEnd, setIsOpen, load } = slice.actions;
 
 
@@ -70,7 +72,7 @@ export const sagas = function* () {
 
   yield all([
     // put your sagas here
-    takeEvery('load', loadDataSaga),
+    takeEvery(load, loadDataSaga),
 
   ]);
 };
