@@ -2,35 +2,35 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { OrderForm } from "../components/OrderForm";
-//import { useCreateOrder } from "../hooks/useCreateOrder";
-import { useSaveOrder } from "../hooks/useSaveOrder";
 import { useHistory } from "react-router";
 import {useDispatch, useSelector} from "react-redux";
-import * as CartDuck from "../../cart/ducks/cart.duck";
+import * as OrderDuck from "../ducks/order.duck";
 
 export function CreateOrderPage() {
     const history = useHistory();
     const dispatch = useDispatch();
-    /*
-    const createMutation = useCreateOrder(() => {
-     //   history.push("/");
-    });
-     */
 
     const onSubmit = (values) => {
-        console.log('values',values);
-        //dispatch(CartDuck.saveOrder({firstName:values.firstName,lastName:values.lastName}));
+        dispatch(OrderDuck.saveOrder({
+            firstName:    values.firstName,
+            lastName:     values.lastName,
+            country:      values.country,
+            phone:        values.phone,
+            city:         values.city,
+            address:      values.address,
+            address2:     values.address2,
+            email:        values.email,
+            deliveryType: values.delivery,
+            dontCallMe:   values.dontCallMe,
+            comment:      "",
+                }));
+        history.push("/order2");
     }
-    const createOrder = useSaveOrder((e) => {
-        e.preventDefault();
-       // history.push("/posts");
-    });
 
   return (
     <div className="page">
       Create Order page
         <OrderForm
-            //onSubmit={createMutation.mutate}
             onSubmit={onSubmit}
         />
 

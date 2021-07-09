@@ -9,8 +9,8 @@ export function useSaveOrder(event) {
     console.log(target);
     //cb = () => {}
     //const queryClient = useQueryClient();
-    const dispatch = useDispatch();
-    dispatch(CartDuck.saveOrder({firstName:'testName',lastName:'testLastName'}));
+    //const dispatch = useDispatch();
+    //dispatch(CartDuck.saveOrder({firstName:'testName',lastName:'testLastName'}));
     /*
     return useMutation(({ firstName, lastName }) => {
         return create({
