@@ -17,7 +17,6 @@ export const SET_FIELD = 'SET_FIELD';
 export const CHECK_ITEM = 'CHECK_ITEM';
 export const SAVE_PRODUCTS = 'SAVE_PRODUCTS';
 export const SAVE_CATEGORIES = 'SAVE_CATEGORIES';
-//export const SAVE_ORDER = 'SAVE_ORDER';
 
 // action creators
 export function addItem(product) {
@@ -55,28 +54,6 @@ export function checkItem() {
   }
 }
 
-export function saveProducts(products) {
-  return {
-    type: SAVE_PRODUCTS,
-    products,
-  }
-}
-
-export function saveCategories(categories) {
-  return {
-    type: SAVE_CATEGORIES,
-    categories,
-  }
-}
-/*
-export function saveOrder(order) {
-  return {
-    type: SAVE_ORDER,
-    order,
-  }
-}
- */
-
 export function setField(key, value) {
   return {
     type: SET_FIELD,
@@ -87,12 +64,9 @@ export function setField(key, value) {
 
 // initial state
 const initialState = {
-  products: [],
-  categories: [],
   items: [],
   numProducts: 0,
   total: 0,
-  //order:{},
 };
 
 const reducerReactionsMap = {
@@ -101,14 +75,12 @@ const reducerReactionsMap = {
 
 // reducer
 export function reducer(state = initialState, action) {
-  let { type, id, qty, product, key, value, products, categories, order } = action;
-  //console.log('type');
-  //console.log(type);
+  let { type, id, qty, product, key, value } = action;
+
   switch (type) {
     case ADD_ITEM:
 
       return produce(state, (s) => {
-
         let index = s.items.findIndex((el) => el.id == product.id);
         if (index > -1) {
           s.items[index].qty = s.items[index].qty + 1;
@@ -124,11 +96,7 @@ export function reducer(state = initialState, action) {
           s.items.push(prod);
           s.total = parseFloat(s.total) + parseFloat(product.price);
         }
-
-
         s.numProducts = s.numProducts + 1;
-        console.log(s.items);
-
       });
 
 
@@ -161,30 +129,11 @@ export function reducer(state = initialState, action) {
 
     case CLEAR_CART:
       return produce(state, (s) => {
-        s.products = [];
         s.items = [];
-        s.amounts = [];
         s.numProducts = 0;
         s.total = 0;
 
       });
-
-    case SAVE_PRODUCTS:
-      return produce(state, (s) => {
-        s.products = products;
-      });
-
-    case SAVE_CATEGORIES:
-      return produce(state, (s) => {
-        s.categories = categories;
-      });
-/*
-    case SAVE_ORDER:
-      return produce(state, (s) => {
-        s.order = order;
-      });
-*/
-
 
     case SET_FIELD:
       return produce(state, s => {
@@ -200,10 +149,8 @@ export function reducer(state = initialState, action) {
 export const selectField = (s,key) => s[namespace][key];
 export const selectNumProducts = (s) => selectField(s,'numProducts');
 export const selectItems = state => state[namespace].items;
-export const selectProducts = state => state[namespace].products;
-export const selectCategories = state => state[namespace].categories;
 export const selectTotal = state => state[namespace].total;
-//export const selectOrder = state => state[namespace].order;
+
 
 
 

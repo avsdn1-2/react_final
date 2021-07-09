@@ -13,9 +13,14 @@ import * as OrderDuck from "../ducks/order.duck";
 import "../../../my_css.css";
 import Box from "@material-ui/core/Box";
 import axios from 'axios';
+import {useQuery} from "react-query";
+import {getList} from "../../catalog/api/CatalogAPI";
+import {create} from "../api/OrderAPI";
 
 export function OrderPageStep2() {
-    const [isLoading,setIsLoading] = useState(false);
+    const [catalog,setCatalog] = useState([]);
+    const [isLoadingProducts,setIsLoadingProducts] = useState(false);
+    const [isLoadingOrder,setIsLoadingOrder] = useState(true);
     const [id,setId] = useState(null);
     const history = useHistory();
     const dispatch = useDispatch();
@@ -28,15 +33,20 @@ export function OrderPageStep2() {
         products_id.push(el.id);
         cart.push({product:el.id,amount:el.qty});
     });
-    //достаем выбранные товары
-    const catalog = useSelector(CartDuck.selectProducts);
+    //загружаем товары
+    const { data,error,isLoading } = useQuery("products", async () => {
+        let { data } = await getList();
+        setCatalog(data);
+        setIsLoadingProducts(isLoading);
+    });
+    //выбираем выбранные товары
     let selectedProducts = catalog.filter(product => products_id.includes(product.id));
     //достаем количество выбранных товаров и общую стоимость
     const numProducts = useSelector(CartDuck.selectNumProducts);
     const total = useSelector(CartDuck.selectTotal);
     const order = useSelector(OrderDuck.selectOrder);
 
-    const sendOrder = () => {
+    const useSendOrder = () => {
         let newOrder = {
             firstName:    order.firstName,
             lastName:     order.lastName,
@@ -46,25 +56,30 @@ export function OrderPageStep2() {
             address:      order.address,
             address2:     order.address2,
             email:        order.email,
-            deliveryType: order.delivery,
+            deliveryType: order.deliveryType,
             dontCallMe:   order.dontCallMe,
-            comment:      "",
+            comment:      order.comment,
             cart:         cart,
-
         }
-        console.log('order');
-        console.log(newOrder);
+        //console.log('order');
+        //console.log(newOrder);
+
         axios.post("https://60bb880442e1d00017620c95.mockapi.io/order", newOrder)
             .then( (response) => {
                 dispatch(OrderDuck.saveId(response.data.id));
                 setId(response.data.id);
-                //console.log(response.data.id);
-
-                setIsLoading(false);
+                setIsLoadingOrder(false);
             })
             .catch((error) => {
-                setIsLoading(false);
+                setIsLoadingOrder(false);
             });
+
+
+        /*
+        const { data,error,isLoading } = useQuery("order", async () => {
+            let result = await create(newOrder);
+        });
+         */
     }
 
 
@@ -72,17 +87,22 @@ export function OrderPageStep2() {
   return (
     <div className="page">
       Order page step2
-        <div className="title">Содержимое корзины</div>
+        {
+            isLoadingProducts ? (<div>Загрузка...</div>) :
 
-            <div className="item w-50 bw">Фото</div>
-            <div className="item w-300 bw">Название</div>
-            <div className="item w-100 bw">Цена</div>
-            <div className="item w-100 bw">Количество</div>
-            <div className="item w-100 bw">Стоимость</div>
-            <div style={{clear:'both'}}></div>
-            {
-                selectedProducts.map((product,i) => (
-                    <div key={i}>
+            (
+                <div>
+                    <div className="title">Содержимое корзины</div>
+
+                    <div className="item w-50 bw">Фото</div>
+                    <div className="item w-300 bw">Название</div>
+                    <div className="item w-100 bw">Цена</div>
+                    <div className="item w-100 bw">Количество</div>
+                    <div className="item w-100 bw">Стоимость</div>
+                    <div style={{clear:'both'}}></div>
+                    {
+                        selectedProducts.map((product,i) => (
+                        <div key={i}>
 
                         <div className="item w-50"><img width="50px" height="50px" src={product.photo}/></div>
                         <div className="item w-300">{product.title}</div>
@@ -93,67 +113,72 @@ export function OrderPageStep2() {
                         <div style={{clear:'both'}}></div>
 
 
-                    </div>
-                ))
-            }
-            <div className="item w-50"></div>
-            <div className="item w-300 bw">ИТОГО</div>
-            <div className="item w-100"></div>
-            <div className="item w-100 bw">{numProducts}</div>
-            <div className="item w-100 bw">{total}</div>
-            <div style={{clear:'both'}}></div>
+                        </div>
+                        ))
+                    }
+                    <div className="item w-50"></div>
+                    <div className="item w-300 bw">ИТОГО</div>
+                    <div className="item w-100"></div>
+                    <div className="item w-100 bw">{numProducts}</div>
+                    <div className="item w-100 bw">{total}</div>
+                    <div style={{clear:'both'}}></div>
 
-            <table>
-                <tr className="w-300">
+                    <table>
+                    <tr className="w-300">
                     <td>firstName</td>
                     <td>{ order.firstName }</td>
-                </tr>
-                <tr className="w-300">
+                    </tr>
+                    <tr className="w-300">
                     <td>lastName</td>
                     <td>{ order.lastName }</td>
-                </tr>
-                <tr className="w-300">
+                    </tr>
+                    <tr className="w-300">
                     <td>country</td>
                     <td>{ order.country }</td>
-                </tr>
-                <tr className="w-300">
+                    </tr>
+                    <tr className="w-300">
                     <td>phone</td>
                     <td>{ order.phone }</td>
-                </tr>
-                <tr className="w-300">
+                    </tr>
+                    <tr className="w-300">
                     <td>city</td>
                     <td>{ order.city }</td>
-                </tr>
-                <tr className="w-300">
+                    </tr>
+                    <tr className="w-300">
                     <td>address</td>
                     <td>{ order.address }</td>
-                </tr>
-                <tr className="w-300">
+                    </tr>
+                    <tr className="w-300">
                     <td>address2</td>
                     <td>{ order.address2 }</td>
-                </tr>
-                <tr className="w-150">
+                    </tr>
+                    <tr className="w-150">
                     <td>email</td>
                     <td>{ order.email }</td>
-                </tr>
-                <tr className="w-150">
+                    </tr>
+                    <tr className="w-150">
                     <td>delivery</td>
                     <td>{ order.deliveryType == 'post'? 'Почтовая служба' : 'Самовывоз' }</td>
-                </tr>
-                <tr className="w-150">
+                    </tr>
+                    <tr className="w-150">
                     <td>Подтверждающий звонок</td>
                     <td>{ order.dontCallMe == true? 'Да' : 'Нет' }</td>
-                </tr>
-                <tr className="w-150">
+                    </tr>
+                    <tr className="w-150">
                     <td>Comment</td>
                     <td>{ order.comment }</td>
-                </tr>
-            </table>
+                    </tr>
+                    </table>
 
-        <Box mt={4}>
-            <Button component={Link} onClick={sendOrder} to={`/order3/${id}`}>Оформить заказ</Button>
-            <Button component={Link}  to="/order">Отредактировать заказ</Button>
-        </Box>
+                    <Box mt={4}>
+                    <Button component={Link} onClick={useSendOrder} to="/order3">Оформить заказ</Button>
+                    <Button component={Link}  to="/order">Отредактировать заказ</Button>
+                    </Box>
+                </div>
+            )
+        }
+
+
 
 
     </div>

@@ -21,7 +21,7 @@ export const routes = [
   },
   {
     key: `${featureConf}/order`,
-    path: '/order3/:id',
+    path: '/order3',
     component: OrderPageStep3,
     exact: true,
   },

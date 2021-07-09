@@ -19,21 +19,45 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import {useDispatch, useSelector} from "react-redux";
+import * as CatalogDuck from "../ducks/catalog.duck";
 import * as CartDuck from "../../cart/ducks/cart.duck";
+
 
 
 
 export function CatalogPage(classes) {
     const [catalog,setCatalog] = useState([]);
     const [allData,setAllData] = useState([]);
-    const [categories,setCategories] = useState([]);
-    const [categoriesNames,setCategoriesNames] = useState([]);
     const [categoriesNew,setCategoriesNew] = useState([]);
     const [mainCheckboxState,setMainCheckboxState] = useState(false);
-    const [categoriesStates,setCategoriesStates] = useState([]);
-    const [chosenCategories,setChosenCategories] = useState([]);
+
+    //стягиваем категории с глобального хранилища
+    const dataCat = useSelector(CatalogDuck.selectData);
+    let cats = []; //id всех категорий
+    let catsNames = []; //названия всех категорий
+    dataCat.forEach(function(category){
+        cats.push(category.id);
+        catsNames.push(category.name);
+    });
 
 
+    let catStates = [];
+    cats.forEach(function(cat,i){
+        let st = {
+            id:cat,
+            state: false,
+        };
+        catStates.push(st);
+    });
+
+    const [categories,setCategories] = useState(cats);
+    const [categoriesNames,setCategoriesNames] = useState(catsNames);
+    const [chosenCategories,setChosenCategories] = useState(cats);
+    const [categoriesStates,setCategoriesStates] = useState(catStates);
+
+
+    /*
+    //загрузка категорий с сервиса
     const { data: dataC, error: errorC, isLoading: isLoadingC } = useQuery("category", async () => {
         let { data: dataC } = await getCategories();
         //return dataC;
@@ -57,55 +81,21 @@ export function CatalogPage(classes) {
             catStates.push(st);
         });
         setCategoriesStates(catStates);
-
-
-
     });
+     */
 
-    //console.log(dataC);
+
 
     const { data,error,isLoading } = useQuery("products", async () => {
         let { data } = await getList();
-        //return data;
         setAllData(data);
         setCatalog(data);
-        /*
-        let cats = [];
-        data.forEach(function(product,i){
-            product.categories.forEach(function(category,ind){
-                if (!cats.includes(category) && category != null) {
-                    cats.push(category);
-                }
-            });
-        });
-
-        cats.sort();
-        setCategories(cats);
-        setChosenCategories(cats);
-
-
-        let catStates = [];
-
-        cats.forEach(function(cat,i){
-            let st = {
-                id:cat,
-                state:categoriesStates.length == 0? false: categoriesStates[i].state
-            };
-            catStates.push(st);
-        });
-        setCategoriesStates(catStates);
-        */
-
     });
 
 
 
     // получим ссылку на метод dispatch объекта store
     const dispatch = useDispatch();
-    const saveCategories = (categories) => dispatch(CartDuck.saveCategories(categories));
-
-    saveCategories(categories);
-
 
     const [isInStore,setIsInStore] = useState(false);
     const [isSale,setIsSale] = useState(false);
@@ -116,17 +106,7 @@ export function CatalogPage(classes) {
     //для слайдера рейтинга
     const [ratingRange, setRatingRange] = useState([0, 100]);
 
-
     const addProduct = (product) => dispatch(CartDuck.addItem(product)); // сгенерируем функции для действий
-
-    const saveProducts = (products) => dispatch(CartDuck.saveProducts(products));
-    const checkProduct = (value) => dispatch(CartDuck.checkItem(value));
-    //сохраняем все продукты в глобальное состояние
-    saveProducts(catalog);
-
-
-
-
 
 
     const handleChangeIsInStore = () => {
@@ -160,9 +140,7 @@ export function CatalogPage(classes) {
             name = target.name; //название категории
             let ind = categoriesNames.indexOf(name);
             let category_id = categories[ind];
-            //alert(target.checked);
             let val = target.checked;
-            //alert(val);
 
         let catStates = categoriesStates;
 
@@ -177,11 +155,7 @@ export function CatalogPage(classes) {
            }
         });
         setChosenCategories(chosen);
-        saveCategories(chosen);
 
-        console.log(categories);
-        console.log(catStates);
-        console.log(chosen);
     }
 
     const handleMainCheckboxChange = (event) => {
@@ -209,12 +183,11 @@ export function CatalogPage(classes) {
 
     }
 
-    //let chosenCat = useSelector(CartDuck.selectCategories);
-
 
     return (
         <div className="page">
-            {isLoading || isLoadingC?
+            { /*isLoading || isLoadingC?*/
+                isLoading ?
                 <div>Loading...</div>
                 : error ?
                     <div>Something went wrong...</div>

@@ -9,6 +9,7 @@ import * as OrderDuck from "../ducks/order.duck";
 export function CreateOrderPage() {
     const history = useHistory();
     const dispatch = useDispatch();
+    const order = useSelector(OrderDuck.selectOrder);
 
     const onSubmit = (values) => {
         dispatch(OrderDuck.saveOrder({
@@ -20,7 +21,7 @@ export function CreateOrderPage() {
             address:      values.address,
             address2:     values.address2,
             email:        values.email,
-            deliveryType: values.delivery,
+            deliveryType: values.deliveryType,
             dontCallMe:   values.dontCallMe,
             comment:      "",
                 }));
@@ -32,6 +33,7 @@ export function CreateOrderPage() {
       Create Order page
         <OrderForm
             onSubmit={onSubmit}
+            editOrder={order}
         />
 
     </div>

@@ -30,10 +30,22 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export function OrderForm({onSubmit = console.log, isSubmitting = false }) {
+export function OrderForm({editOrder = null, onSubmit = console.log, isSubmitting = false }) {
     const { formState: { errors }, handleSubmit, control, register } = useForm({
-        defaultValues: {},
-    });
+        defaultValues: editOrder ? {
+            firstName:    editOrder.firstName,
+            lastName:     editOrder.lastName,
+            country:      editOrder.country,
+            phone:        editOrder.phone,
+            city:         editOrder.city,
+            address:      editOrder.address,
+            address2:     editOrder.address2,
+            email:        editOrder.email,
+            deliveryType: editOrder.delivery,
+            dontCallMe:   editOrder.dontCallMe,
+            comment:      editOrder.comment,
+        } : {},
+    })
 
     //console.log(register("test"));
 

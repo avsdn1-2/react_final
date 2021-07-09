@@ -6,20 +6,18 @@ export const namespace = 'catalog';
 
 const slice = createSlice({
   name: namespace,
-  //name: 'catalog',
   initialState: {
     isOpen: false,
     isLoading: false,
     data: null,
     error: null,
+    categories:[]
   },
   reducers: {
     loadStart: (state, action) => {
       state.isLoading = true;
     },
     loadEnd: (state, action) => {
-      console.log('loadEnd_action');
-      console.log(action);
       let { payload: { data = [], error = null } } = action;
       state.isLoading = false;
       state.data = data;
@@ -33,13 +31,10 @@ const slice = createSlice({
   },
 });
 
-console.log('slice.actions');
-console.log(slice.actions);
 export const { loadStart, loadEnd, setIsOpen, load } = slice.actions;
 
 
 export const reducer = slice.reducer;
-//export default reducer;
 
 export const selectIsLoading = (s) => s[namespace].isLoading;
 export const selectData = (s) => s[namespace].data;
