@@ -30,6 +30,7 @@ export function CatalogPage(classes) {
     const [allData,setAllData] = useState([]);
     const [categoriesNew,setCategoriesNew] = useState([]);
     const [mainCheckboxState,setMainCheckboxState] = useState(false);
+    const [productsInCart,setProductsInCart] = useState([]);
 
     //стягиваем категории с глобального хранилища
     const dataCat = useSelector(CatalogDuck.selectData);
@@ -106,7 +107,13 @@ export function CatalogPage(classes) {
     //для слайдера рейтинга
     const [ratingRange, setRatingRange] = useState([0, 100]);
 
-    const addProduct = (product) => dispatch(CartDuck.addItem(product)); // сгенерируем функции для действий
+    //const addProduct = (product) => dispatch(CartDuck.addItem(product)); // сгенерируем функции для действий
+    const addProduct = (product) => {
+        setProductsInCart([...productsInCart,product.id]);
+        dispatch(CartDuck.addItem(product));
+        //console.log('productsInCart',productsInCart);
+
+    }
 
 
     const handleChangeIsInStore = () => {
@@ -391,9 +398,20 @@ export function CatalogPage(classes) {
                                             {
                                                 product.isInStock ?
                                                     (
-                                                        <Button onClick={() => addProduct(product)} exact component={Link} variant="contained" color="primary">
-                                                            Добавить в корзину
-                                                        </Button>
+
+                                                            productsInCart.includes(product.id) ? (
+                                                                    <Button exact component={Link} variant="contained" color="outline">
+                                                                        Товар в корзине
+                                                                    </Button>
+                                                                ) :
+                                                                (
+                                                                    <Button onClick={() => addProduct(product)} exact component={Link} variant="contained" color="primary">
+                                                                        Добавить в корзину
+                                                                    </Button>
+                                                                )
+
+
+
                                                     ) :
                                                     (
                                                         <Button variant="contained" disabled>
